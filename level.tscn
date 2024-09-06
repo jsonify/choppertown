@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://gqukheogorsl"]
+[gd_scene load_steps=7 format=3 uid="uid://gqukheogorsl"]
 
-[ext_resource type="Script" path="res://level.gd" id="1_qpyvr"]
+[ext_resource type="MeshLibrary" uid="uid://dvwdxsws0r2k3" path="res://buildings.tres" id="2_1vpex"]
+[ext_resource type="PackedScene" uid="uid://pe20ipdc1u1y" path="res://Scenes/Player/player.tscn" id="3_nyn1i"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7q32n"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -15,8 +16,12 @@ sky = SubResource("Sky_u1741")
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_b5lfs"]
+
 [node name="Level" type="Node3D"]
-script = ExtResource("1_qpyvr")
+
+[node name="Player" parent="." instance=ExtResource("3_nyn1i")]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.07892, 4.27447, 0.325843)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_wyhnb")
@@ -25,7 +30,9 @@ environment = SubResource("Environment_wyhnb")
 transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
 shadow_enabled = true
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.913545, 0.406737, 0, -0.406737, 0.913545, 3.21, 8.73, 9.758)
-
-[node name="RigidBody3D" type="RigidBody3D" parent="."]
+[node name="GridMap" type="GridMap" parent="."]
+mesh_library = ExtResource("2_1vpex")
+physics_material = SubResource("PhysicsMaterial_b5lfs")
+data = {
+"cells": PackedInt32Array(0, 0, 0, 65535, 0, 0, 65534, 0, 0, 65533, 0, 0, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, 0, 0, 65535, 0, 0, 65534, 0, 65535, 65534, 0, 65534, 65534, 0, 65533, 65534, 0, 65533, 1, 0, 65534, 1, 0, 65535, 1, 0, 0, 1, 0, 0, 2, 0, 65535, 2, 0, 65534, 2, 0, 65533, 2, 0, 65532, 2, 0, 65532, 1, 0, 65532, 0, 0, 65532, 65535, 0, 65532, 65534, 0)
+}

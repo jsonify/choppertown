@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://gqukheogorsl"]
+
+[ext_resource type="Script" path="res://level.gd" id="1_qpyvr"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_7q32n"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_u1741"]
+sky_material = SubResource("ProceduralSkyMaterial_7q32n")
+
+[sub_resource type="Environment" id="Environment_wyhnb"]
+background_mode = 2
+sky = SubResource("Sky_u1741")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Level" type="Node3D"]
+script = ExtResource("1_qpyvr")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wyhnb")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.913545, 0.406737, 0, -0.406737, 0.913545, 3.21, 8.73, 9.758)
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]

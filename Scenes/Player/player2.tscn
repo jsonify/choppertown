@@ -1,0 +1,107 @@
+[gd_scene load_steps=10 format=3 uid="uid://b6jbmiecc0l7"]
+
+[ext_resource type="Script" path="res://Scenes/Player/player_2.gd" id="1_3uoue"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_uhnwv"]
+size = Vector3(1, 0.3, 0.5)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_fvykb"]
+top_radius = 0.025
+bottom_radius = 0.075
+height = 0.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_n2q2v"]
+size = Vector3(0.8, 0.1, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ulice"]
+size = Vector3(1.15, 0.05, 0.05)
+
+[sub_resource type="BoxMesh" id="BoxMesh_qjofy"]
+size = Vector3(0.05, 0.2, 0.025)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hevn8"]
+size = Vector3(0.2, 0.2, 0.1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_x2aer"]
+size = Vector3(2.25, 0.02, 0.14)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_eo5au"]
+size = Vector3(2.25195, 0.728935, 2.3158)
+
+[node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.610655, 0)
+axis_lock_linear_z = true
+axis_lock_angular_x = true
+axis_lock_angular_y = true
+script = ExtResource("1_3uoue")
+
+[node name="HelicopterBody" type="Node3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="Body" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.472166, -0.214688, 0)
+mesh = SubResource("BoxMesh_uhnwv")
+
+[node name="Body2" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.186059, 0.0396317, 0)
+mesh = SubResource("CylinderMesh_fvykb")
+
+[node name="Tail" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.418879, -0.25, 0)
+mesh = SubResource("BoxMesh_n2q2v")
+
+[node name="Skid1" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.457954, -0.527826, -0.2)
+mesh = SubResource("BoxMesh_ulice")
+
+[node name="SkidArm1" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287654, -0.423809, -0.2)
+mesh = SubResource("BoxMesh_qjofy")
+
+[node name="SkidArm2" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.809662, -0.423809, -0.2)
+mesh = SubResource("BoxMesh_qjofy")
+
+[node name="Skid2" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.457954, -0.527826, 0.2)
+mesh = SubResource("BoxMesh_ulice")
+
+[node name="SkidArm3" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.287654, -0.423809, 0.2)
+mesh = SubResource("BoxMesh_qjofy")
+
+[node name="SkidArm4" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.809662, -0.423809, 0.2)
+mesh = SubResource("BoxMesh_qjofy")
+
+[node name="RearRotor" type="MeshInstance3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.899135, -0.25, 0)
+mesh = SubResource("BoxMesh_hevn8")
+
+[node name="Rotor" type="Node3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.182959, 0.145217, 0)
+
+[node name="Blade1" type="MeshInstance3D" parent="HelicopterBody/Rotor"]
+mesh = SubResource("BoxMesh_x2aer")
+skeleton = NodePath("../..")
+
+[node name="Blade2" type="MeshInstance3D" parent="HelicopterBody/Rotor"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("BoxMesh_x2aer")
+skeleton = NodePath("../..")
+
+[node name="BulletSpawn" type="Marker3D" parent="HelicopterBody"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.08232, -0.3165, 0)
+
+[node name="CollisionShape3D2" type="CollisionShape3D" parent="."]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0.00699522, -0.198169, -0.152452)
+shape = SubResource("BoxShape3D_eo5au")
+
+[node name="RocketAudio" type="AudioStreamPlayer3D" parent="."]
+
+[node name="CameraMount" type="Node3D" parent="."]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, -2.842)
+
+[node name="Camera3D" type="Camera3D" parent="CameraMount"]
+transform = Transform3D(1, 0, 0, 0, 0.972149, 0.234362, 0, -0.234362, 0.972149, 0, 0.667677, -1.05464)
+current = true

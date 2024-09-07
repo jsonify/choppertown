@@ -28,17 +28,12 @@ size = Vector3(2.25, 0.02, 0.14)
 [sub_resource type="BoxShape3D" id="BoxShape3D_eo5au"]
 size = Vector3(2.25195, 0.728935, 2.3158)
 
-[node name="Player" type="RigidBody3D"]
+[node name="Player" type="CharacterBody3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.610655, 0)
 axis_lock_linear_z = true
 axis_lock_angular_x = true
 axis_lock_angular_y = true
-contact_monitor = true
-max_contacts_reported = 10
-linear_damp = 1.0
-angular_damp = 3.0
 script = ExtResource("1_4oxyg")
-rotor_speed = 20.0
 
 [node name="HelicoptorBody" type="Node3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
@@ -110,5 +105,3 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2.8415)
 [node name="Camera3D" type="Camera3D" parent="CameraMount"]
 transform = Transform3D(1, 0, 0, 0, 0.972149, 0.234362, 0, -0.234362, 0.972149, 0, 0.667677, -1.05464)
 current = true
-
-[connection signal="body_entered" from="." to="." method="_on_body_entered"]

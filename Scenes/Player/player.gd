@@ -1,140 +1,96 @@
-class_name Player extends RigidBody3D
+class_name Player extends CharacterBody3D
 
-@export_range(750.0, 3500.0) var thrust := 1000.0
-@export var torque_thrust := 2.0
-@export var tilt_force := 500.0
-@export var rotor_speed := 5.0
-@export var max_tilt_angle := 20.0
+@export var vertical_speed := 5.0
+@export var forward_speed := 10.0
+@export var rotation_speed := 2.0
+@export var drift_speed := 5.0
+@export var acceleration := 0.1
+@export var deceleration := 0.05
+@export var gravity := -9.8
 
-@onready var helicoptor_body: Node3D = $HelicoptorBody
-@onready var rotor: Node3D = $HelicoptorBody/Rotor
-@onready var bullet_spawn: Marker3D = $HelicoptorBody/BulletSpawn
-@onready var camera_3d: Camera3D = $CameraMount/Camera3D
+var helicopter_body: Node3D
+var camera_mount: Node3D
 
-var is_transitioning := false
-var rotors_active := false
-var can_restart_rotor := true
-var current_tilt := 0.0
+var target_velocity := Vector3.ZERO
+var current_rotation := 0.0
 
-@export_group("Camera")
-@export var camera_distance := 5.0
-@export var camera_height := 2.0
+func _ready() -> void:
+	print("Simplified Helicopter Player script initialized")
+	setup_nodes()
 
-var camera_offset := Vector3(0, 2, 5)
-const BULLET = preload("res://Scenes/Player/bullet.tscn")
-@export var fire_rate := 0.2
-var can_fire := true
-
-func _ready():
-	call_deferred("update_camera_position")
-	print("Initial player rotation: ", rotation_degrees)
-	print("Initial helicoptor_body rotation: ", helicoptor_body.rotation_degrees)
+func setup_nodes() -> void:
+	# Try to find the helicopter body
+	helicopter_body = find_child("*Body*", false, false)
+	if not helicopter_body:
+		print("Warning: No node with 'Body' in its name found. Creating a placeholder.")
+		helicopter_body = Node3D.new()
+		add_child(helicopter_body)
+	
+	# Try to find the camera mount
+	camera_mount = find_child("*Camera*", false, false)
+	if not camera_mount:
+		print("Warning: No node with 'Camera' in its name found. Creating a new CameraMount.")
+		camera_mount = Node3D.new()
+		camera_mount.name = "CameraMount"
+		add_child(camera_mount)
+		var camera = Camera3D.new()
+		camera_mount.add_child(camera)
 
 func _physics_process(delta: float) -> void:
-	if rotors_active:
-		rotate_rotors(delta)
-	
 	handle_input(delta)
-	
-	if is_inside_tree():
-		update_camera_position()
-	
-	# Apply tilt to the helicopter body
-	var tilt_quat = Quaternion(Vector3.RIGHT, deg_to_rad(current_tilt))
-	helicoptor_body.transform = Transform3D(tilt_quat) * helicoptor_body.transform.orthonormalized()
-	
-	print("Current tilt: ", current_tilt)
-	print("Player rotation: ", rotation_degrees)
-	print("Helicoptor body rotation: ", helicoptor_body.rotation_degrees)
+	apply_movement(delta)
+	update_camera_position()
 
-func handle_input(delta):
-	var tilt_direction = 0.0
-	var move_direction = Vector3.ZERO
-
+func handle_input(delta: float) -> void:
+	var input_dir := Vector3.ZERO
+	
+	# Vertical movement (lift)
 	if Input.is_action_pressed("thrust"):
-		if can_restart_rotor and not rotors_active:
-			start_rotor()
-		apply_central_force(basis.y * delta * thrust)
+		input_dir.y += 1
+	elif Input.is_action_pressed("descend"):
+		input_dir.y -= 1
 	
-	if Input.is_action_pressed("backwards"):
-		tilt_direction += 1.0
-		move_direction += -basis.z
-
+	# Forward movement
 	if Input.is_action_pressed("forward"):
-		tilt_direction -= 1.0
-		move_direction += basis.z
-
-	# Update tilt
-	current_tilt = move_toward(current_tilt, tilt_direction * max_tilt_angle, torque_thrust * delta)
+		input_dir.z -= 1
 	
-	# Apply force in the direction of tilt
-	if move_direction != Vector3.ZERO:
-		apply_central_force(move_direction.normalized() * tilt_force * delta)
-
-	if Input.is_action_pressed("fire") and can_fire:
-		shoot()
-		
-	if Input.is_action_just_pressed("restart"):
-		get_tree().reload_current_scene()
-
-func rotate_rotors(delta: float):
-	rotor.rotate_y(delta * rotor_speed)
-
-func start_rotor():
-	rotors_active = true
-	can_restart_rotor = false
-	var tween = create_tween()
-	tween.tween_property(self, "rotor_speed", 25.0, 0.5)
-
-func shoot():
-	var bullet_instance = BULLET.instantiate()
-	bullet_instance.global_transform = bullet_spawn.global_transform
-	get_tree().root.add_child(bullet_instance)
-	apply_central_impulse(-bullet_spawn.global_transform.basis.z * 5)
-	can_fire = false
-	await get_tree().create_timer(fire_rate).timeout
-	can_fire = true
-
-func update_camera_position():
-	if not is_inside_tree():
-		return
+	# Yaw (turning)
+	if Input.is_action_pressed("left"):
+		current_rotation -= rotation_speed * delta
+	elif Input.is_action_pressed("right"):
+		current_rotation += rotation_speed * delta
 	
-	camera_offset = Vector3(0, camera_height, camera_distance)
-	var target_position = global_position + global_transform.basis * camera_offset
-	camera_3d.global_position = camera_3d.global_position.lerp(target_position, 0.1)
-	camera_3d.look_at(global_position + global_transform.basis.y * 2, global_transform.basis.y)
+	# Horizontal drift
+	if Input.is_action_pressed("drift_left"):
+		input_dir.x -= 1
+	elif Input.is_action_pressed("drift_right"):
+		input_dir.x += 1
+	
+	# Apply rotation to the entire node
+	global_rotation.y = current_rotation
+	
+	# Calculate target velocity
+	target_velocity = input_dir.rotated(Vector3.UP, global_rotation.y)
+	target_velocity *= Vector3(drift_speed, vertical_speed, forward_speed)
 
-func _on_body_entered(body: Node) -> void:
-	if is_transitioning:
-		return
+func apply_movement(delta: float) -> void:
+	# Apply basic gravity
+	if not is_on_floor() and target_velocity.y <= 0:
+		target_velocity.y += gravity * delta
+	
+	# Interpolate current velocity towards target velocity
+	velocity = velocity.lerp(target_velocity, acceleration if target_velocity.length() > 0 else deceleration)
+	
+	# Apply movement
+	move_and_slide()
+	
+	# Update helicopter body tilt
+	if helicopter_body:
+		var tilt = -velocity.z * 0.05  # Simple forward tilt based on forward speed
+		helicopter_body.rotation.x = tilt
 
-	match true:
-		_ when body.is_in_group("Goal"):
-			complete_level()
-		_ when body.is_in_group("Hazard"):
-			crash_sequence()
-		_ when body.is_in_group("SafeLanding"):
-			land()
-
-func crash_sequence():
-	print("YOU LOST IT!")
-	helicoptor_body.visible = false
-	set_process(false)
-	is_transitioning = true
-	var tween = create_tween()
-	tween.tween_interval(2.5)
-	tween.tween_callback(get_tree().reload_current_scene)
-
-func complete_level():
-	print("Level Complete")
-	set_process(false)
-	land()
-
-func land():
-	if rotors_active:
-		var tween = create_tween()
-		tween.tween_property(self, "rotor_speed", 0, 1.0)
-		tween.tween_callback(func():
-			rotors_active = false
-			can_restart_rotor = true
-		)
+func update_camera_position() -> void:
+	if camera_mount:
+		var camera_offset = Vector3(0, 2, 5)  # Adjust these values as needed
+		camera_mount.position = camera_offset
+		camera_mount.rotation.x = -0.2  # Slight downward angle

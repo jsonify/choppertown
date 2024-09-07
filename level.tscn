@@ -20,9 +20,6 @@ glow_enabled = true
 
 [node name="Level" type="Node3D"]
 
-[node name="Player" parent="." instance=ExtResource("1_y248f")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.838167, 4.3547, 1.30886)
-
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_wyhnb")
 
@@ -36,3 +33,6 @@ physics_material = SubResource("PhysicsMaterial_b5lfs")
 data = {
 "cells": PackedInt32Array(0, 0, 0, 65535, 0, 0, 65534, 0, 0, 65533, 0, 0, 65533, 65535, 0, 65534, 65535, 0, 65535, 65535, 0, 0, 65535, 0, 0, 65534, 0, 65535, 65534, 0, 65534, 65534, 0, 65533, 65534, 0, 65533, 1, 0, 65534, 1, 0, 65535, 1, 0, 0, 1, 0, 0, 2, 0, 65535, 2, 0, 65534, 2, 0, 65533, 2, 0, 65532, 2, 0, 65532, 1, 0, 65532, 0, 0, 65532, 65535, 0, 65532, 65534, 0)
 }
+
+[node name="Player_2" parent="." instance=ExtResource("1_y248f")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.04848, 4.79468, 0)
